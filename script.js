@@ -4,13 +4,25 @@ document.addEventListener('DOMContentLoaded', function () {
   // Inject CSS custom property for use in dynamic styling
   document.documentElement.style.setProperty('--jb-font', "'JetBrains Mono'");
 
+  // Poll for an element to mount, then hand it to callback. Gives up after
+  // timeoutMs so a renamed/removed selector can't spin forever in the background.
+  function waitForElement(selector, callback, intervalMs = 200, timeoutMs = 15000) {
+    const start = Date.now();
+    const intervalId = setInterval(() => {
+      const el = document.querySelector(selector);
+      if (el) {
+        clearInterval(intervalId);
+        callback(el);
+      } else if (Date.now() - start > timeoutMs) {
+        clearInterval(intervalId);
+        console.warn(`[vscode-modifiers] waitForElement: gave up waiting for "${selector}" after ${timeoutMs}ms`);
+      }
+    }, intervalMs);
+  }
+
   // Set default explorer width — intercepts VSCode's first layout pass, then steps aside
   // so drag-resizing works normally afterward
-  const sidebarInit = setInterval(() => {
-    const sidebar = document.querySelector('.part.sidebar');
-    if (!sidebar) return;
-    clearInterval(sidebarInit);
-
+  waitForElement('.part.sidebar', (sidebar) => {
     const sidebarObserver = new MutationObserver(() => {
       sidebar.style.width = EXPLORER_WIDTH + 'px';
       sidebarObserver.disconnect();
@@ -19,10 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }, 200);
 
   // Watch for the command palette and set up its observer
-  const checkElement = setInterval(() => {
-    const commandDialog = document.querySelector('.quick-input-widget');
-    if (!commandDialog) return;
-
+  waitForElement('.quick-input-widget', (commandDialog) => {
     if (commandDialog.style.display !== 'none') {
       showCommandBlur();
     }
@@ -40,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     observer.observe(commandDialog, { attributes: true });
-    clearInterval(checkElement);
   }, 500);
 
   // Single keydown handler for both Ctrl+P and Escape
@@ -48,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if ((event.metaKey || event.ctrlKey) && event.key === 'p') {
       event.preventDefault();
       showCommandBlur();
-    } else if (event.key === 'Escape' || event.key === 'Esc') {
+    } else if (event.key === 'Escape') {
       hideCommandBlur();
     }
   });
@@ -90,9 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (label) label.textContent = getFilenameFromTitle();
   }
 
-  const titleBarInit = setInterval(() => {
-    if (!document.querySelector('.titlebar-center .window-title')) return;
-    clearInterval(titleBarInit);
+  waitForElement('.titlebar-center .window-title', () => {
     syncCommandCenterFilename();
 
     const titleEl = document.querySelector('title');
