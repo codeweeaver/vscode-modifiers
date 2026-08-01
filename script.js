@@ -30,61 +30,91 @@ document.addEventListener('DOMContentLoaded', function () {
     sidebarObserver.observe(sidebar, { attributes: true, attributeFilter: ['style'] });
   }, 200);
 
-  // Watch for the command palette and set up its observer
-  waitForElement('.quick-input-widget', (commandDialog) => {
-    if (commandDialog.style.display !== 'none') {
-      showCommandBlur();
-    }
+  // Command palette blur overlay — layered so no single mechanism has to be
+  // perfectly correct on its own:
+  //  - Ctrl/Cmd+P (open) and Escape/Enter (close) are keys we own directly,
+  //    so those paths are instant and can't misfire.
+  //  - Clicking the backdrop itself is handled by its own listener (set up
+  //    in showCommandBlur below), also instant.
+  //  - Everything else — clicking an item inside the palette, or any other
+  //    path VS Code uses internally to close it — is caught by the poll
+  //    below, which re-checks the widget's actual visibility and can't stay
+  //    wrong for more than ~200ms regardless of mechanism.
+  //  - That poll runs unconditionally from startup, NOT gated behind waiting
+  //    for .quick-input-widget to exist first: VS Code doesn't create that
+  //    element until the palette opens for the first time, so an earlier
+  //    version of this that set the poll up inside a wait for it silently
+  //    never activated unless the palette happened to open within that
+  //    wait's timeout window — which is why only Escape (wired directly,
+  //    independent of all this) ever actually worked.
+  function isPaletteOpen() {
+    const el = document.querySelector('.quick-input-widget');
+    return !!el && getComputedStyle(el).display !== 'none';
+  }
 
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-          if (commandDialog.style.display === 'none') {
-            hideCommandBlur();
-          } else {
-            showCommandBlur();
-          }
-        }
-      });
-    });
-
-    observer.observe(commandDialog, { attributes: true });
-  }, 500);
-
-  // Single keydown handler for both Ctrl+P and Escape
   document.addEventListener('keydown', function (event) {
     if ((event.metaKey || event.ctrlKey) && event.key === 'p') {
       event.preventDefault();
       showCommandBlur();
-    } else if (event.key === 'Escape') {
+    } else if (event.key === 'Escape' || event.key === 'Enter') {
       hideCommandBlur();
     }
   });
 
+  let paletteWasOpen = false;
+  setInterval(() => {
+    const open = isPaletteOpen();
+    if (open === paletteWasOpen) return;
+    paletteWasOpen = open;
+    if (open) {
+      showCommandBlur();
+    } else {
+      hideCommandBlur();
+    }
+  }, 200);
+
+  // Both functions are idempotent and safe to call redundantly — multiple
+  // independent triggers (direct keydown, the visibility poll, backdrop
+  // click) can each call these within the same ~200ms window, and neither
+  // tearing down an in-progress fade-in nor skipping the fade-out entirely
+  // reads as "smooth."
   function showCommandBlur() {
+    let overlay = document.getElementById('command-blur');
+    if (overlay) {
+      // Already showing, or mid fade-out from a very quick close+reopen —
+      // reuse it instead of destroying and rebuilding, which is what
+      // caused the flicker: each rebuild reset opacity to 0 and restarted
+      // the animation from scratch, even if one was already mid-transition.
+      delete overlay.dataset.closing;
+      overlay.style.opacity = '1';
+      return;
+    }
+
     const workbench = document.querySelector('.monaco-workbench');
     if (!workbench) return;
 
-    const existing = document.getElementById('command-blur');
-    if (existing) existing.remove();
-
-    const overlay = document.createElement('div');
+    overlay = document.createElement('div');
     overlay.setAttribute('id', 'command-blur');
     overlay.addEventListener('click', hideCommandBlur);
+    overlay.style.opacity = '0';
     workbench.appendChild(overlay);
 
-    // Animate in
-    overlay.style.opacity = '0';
     requestAnimationFrame(() => {
       overlay.style.opacity = '1';
     });
-
   }
 
   function hideCommandBlur() {
     const overlay = document.getElementById('command-blur');
-    if (overlay) overlay.remove();
+    if (!overlay || overlay.dataset.closing) return;
 
+    overlay.dataset.closing = 'true';
+    overlay.style.opacity = '0';
+    overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+    // Safety net in case transitionend doesn't fire for some reason (e.g.
+    // reduced-motion settings that skip the transition) — remove() on an
+    // already-detached node is a harmless no-op, so this can't double-fire.
+    setTimeout(() => overlay.remove(), 250);
   }
 
   // Sync command center text with the current filename from document.title

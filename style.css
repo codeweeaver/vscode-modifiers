@@ -41,8 +41,13 @@
   background: var(--vscode-editor-background, #1e1e2e) !important;
 }
 
+/* Shadows use --vscode-widget-shadow (the theme's own designed shadow
+   color) mixed to the original opacity, instead of hardcoded black — a
+   flat black shadow reads fine on dark themes but heavy/muddy on light
+   ones; this adapts per-theme instead. */
 .monaco-editor .scroll-decoration {
-  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.75) !important;
+  box-shadow: 0px 6px 16px
+    color-mix(in srgb, var(--vscode-widget-shadow, black) 75%, transparent) !important;
   top: -6px !important;
 }
 
@@ -61,7 +66,8 @@
    SIDEBAR / FILE EXPLORER
    ============================================ */
 .part.sidebar {
-  box-shadow: 8px 0 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 8px 0 20px
+    color-mix(in srgb, var(--vscode-widget-shadow, black) 25%, transparent);
   transition: box-shadow 0.2s ease;
 }
 
@@ -117,7 +123,8 @@
 
 /* Sidebar top shadow */
 .monaco-scrollable-element > .shadow.top {
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.75) !important;
+  box-shadow: 0px 4px 10px
+    color-mix(in srgb, var(--vscode-widget-shadow, black) 75%, transparent) !important;
   top: -3px !important;
 }
 
@@ -127,6 +134,7 @@
   flex-direction: row !important;
   align-items: center !important;
   justify-content: center !important;
+  position: relative !important;
 }
 
 .composite.title h2 {
@@ -145,14 +153,31 @@
   background: var(--vscode-focusBorder, #cba6f7) !important;
 }
 
-/* Collapse the vertical track to match the thumb — eliminates the empty gap */
-.scrollbar.vertical {
+/* Collapse the vertical track to match the thumb — eliminates the empty gap.
+   Scoped per workbench part rather than one blanket rule: the scrollbar is a
+   shared component used by the editor, sidebar, auxiliary bar, and panel
+   alike, and those areas don't all share the same background color on every
+   theme. A single hardcoded background only matched by coincidence on themes
+   where those areas happen to use the same color. */
+.monaco-editor .scrollbar.vertical,
+.monaco-editor .scrollbar.horizontal {
   background: var(--vscode-editor-background, #1e1e2e) !important;
-  width: 3px !important;
 }
 
-.scrollbar.horizontal {
-  background: var(--vscode-editor-background, #1e1e2e) !important;
+.part.sidebar .scrollbar.vertical,
+.part.sidebar .scrollbar.horizontal,
+.part.auxiliarybar .scrollbar.vertical,
+.part.auxiliarybar .scrollbar.horizontal {
+  background: var(--vscode-sideBar-background, #181825) !important;
+}
+
+.part.panel .scrollbar.vertical,
+.part.panel .scrollbar.horizontal {
+  background: var(--vscode-panel-background, #181825) !important;
+}
+
+.scrollbar.vertical {
+  width: 3px !important;
 }
 
 .scrollbar.vertical .slider {
@@ -225,7 +250,8 @@
   font-family: "JetBrains Mono", monospace !important;
   font-size: 13px !important;
   pointer-events: auto !important;
-  box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: 0px 8px 32px
+    color-mix(in srgb, var(--vscode-widget-shadow, black) 45%, transparent) !important;
   background-image: linear-gradient(
     var(--vscode-dropdown-background, #313244) 0%,
     var(--vscode-editor-background, #1e1e2e) 100%
@@ -250,7 +276,8 @@
    ============================================ */
 .context-view.monaco-menu-container {
   border-radius: 14px !important;
-  box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: 0px 8px 32px
+    color-mix(in srgb, var(--vscode-widget-shadow, black) 45%, transparent) !important;
   backdrop-filter: blur(3px) !important;
   border: none !important;
   overflow: hidden !important;
@@ -280,7 +307,8 @@
    ============================================ */
 .editor-widget.suggest-widget {
   border-radius: 14px !important;
-  box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: 0px 8px 32px
+    color-mix(in srgb, var(--vscode-widget-shadow, black) 45%, transparent) !important;
   backdrop-filter: blur(3px) !important;
   border: none !important;
   overflow: hidden !important;
@@ -300,7 +328,8 @@
    ============================================ */
 .notification-toast {
   border-radius: 16px !important;
-  box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: 0px 8px 32px
+    color-mix(in srgb, var(--vscode-widget-shadow, black) 45%, transparent) !important;
   background-image: linear-gradient(
     var(--vscode-dropdown-background, #313244) 0%,
     var(--vscode-editor-background, #1e1e2e) 100%
@@ -432,7 +461,8 @@
   --vscode-editor-font-family: "JetBrains Mono", monospace;
   transform: translateY(-50%) !important;
   top: 50% !important;
-  box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0px 8px 32px
+    color-mix(in srgb, var(--vscode-widget-shadow, black) 35%, transparent) !important;
   padding: 12px 0 16px !important;
   background-image: linear-gradient(
     var(--vscode-dropdown-background, #313244) 0%,
