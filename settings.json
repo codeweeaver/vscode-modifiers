@@ -82,7 +82,7 @@
   "editor.quickSuggestions": {
     "other": "on",
     "comments": "off",
-    "strings": "on",
+    "strings": "on"
   },
 
   // Word Wrap
@@ -94,12 +94,12 @@
   // APC Customize UI++
   "apc.electron": {
     "titleBarStyle": "hidden",
-    "backgroundColor": "#1e1e2e",
+    "backgroundColor": "#1e1e2e"
   },
   "apc.font.family": "MesloLGL Nerd Font",
   "apc.listRow": {
     "lists": ["explorer-folders-view", "quick-input-list", "results"],
-    "height": 30,
+    "height": 30
   },
   "apc.stylesheet": {
     ".title-actions": "display: none !important",
@@ -118,7 +118,7 @@
     ".monaco-scrollable-element > .shadow.top": "display: none !important",
     ".titlebar-container": "background: #1e1e2e !important",
     ".window-appicon": "display: none !important",
-    ".window-title": "display: none !important",
+    ".window-title": "display: none !important"
   },
   "workbench.colorCustomizations": {
     "[Catppuccin Mocha]": {
@@ -126,8 +126,8 @@
       "list.activeSelectionBackground": "#313244",
       "list.inactiveSelectionBackground": "#313244",
       "list.focusBackground": "#313244",
-      "list.hoverBackground": "#313244",
-    },
+      "list.hoverBackground": "#313244"
+    }
   },
 
   // Search & Files
@@ -138,31 +138,31 @@
     "**/dist": true,
     "**/vendor": true,
     "storage": true,
-    "**/package-lock.json": true,
+    "**/package-lock.json": true
   },
 
   // Formatting & Languages
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit",
+    "source.organizeImports": "explicit"
   },
   "emmet.includeLanguages": {
-    "javascript": "javascriptreact",
+    "javascript": "javascriptreact"
   },
   "[markdown]": {
     "editor.wordWrap": "on",
     "editor.quickSuggestions": {
       "comments": "on",
       "strings": "on",
-      "other": "on",
-    },
+      "other": "on"
+    }
   },
   "[json]": {
-    "editor.wordWrap": "on",
+    "editor.wordWrap": "on"
   },
   "[jsonc]": {
-    "editor.wordWrap": "on",
+    "editor.wordWrap": "on"
   },
 
   // Unified Terminal Configuration
@@ -179,23 +179,23 @@
     "Git Bash": {
       "path": "C:\\Program Files\\Git\\bin\\bash.exe",
       "args": ["--login", "-i"],
-      "icon": "terminal-bash",
+      "icon": "terminal-bash"
     },
     "PowerShell 7": {
       "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
       "args": ["-ExecutionPolicy", "Bypass"],
-      "icon": "terminal-powershell",
+      "icon": "terminal-powershell"
     },
     "Command Prompt": {
       "path": "C:\\Windows\\System32\\cmd.exe",
-      "icon": "terminal-cmd",
-    },
+      "icon": "terminal-cmd"
+    }
   },
 
   // Custom CSS/JS Injector (Ensure these paths exist!)
   "vscode_custom_css.imports": [
     "file:///C:/Users/CODEWEEAVER/vscode-modifiers/style.css",
-    "file:///C:/Users/CODEWEEAVER/vscode-modifiers/script.js",
+    "file:///C:/Users/CODEWEEAVER/vscode-modifiers/script.js"
   ],
 
   // AI & Git Settings
@@ -220,7 +220,7 @@
   "claudeCode.preferredLocation": "panel",
   "animations.Install-Method": "Apc Customize UI++",
   "apc.imports": [
-    "file:///c:/Users/CODEWEEAVER/.vscode/extensions/brandonkirbyson.vscode-animations-2.0.7/dist/updateHandler.js",
+    "file:///c:/Users/CODEWEEAVER/.vscode/extensions/brandonkirbyson.vscode-animations-2.0.7/dist/updateHandler.js"
   ],
   "update.mode": "default",
   "workbench.colorTheme": "Field Lights",
@@ -228,5 +228,5 @@
   "workbench.secondarySideBar.defaultVisibility": "hidden",
   "editor.colorDecoratorsActivatedOn": "hover",
   "js/ts.suggest.enabled": false,
-  "chat.mcp.gallery.enabled": true,
+  "chat.mcp.gallery.enabled": true
 }
